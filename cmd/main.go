@@ -42,7 +42,7 @@ func main() {
 		w.Write([]byte("Hello, World!"))
 	})
 
-	server := newServer(config.ServeAddress, router)
+	server := newServer(config.ServeAddress+":"+config.ServePort, router)
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

@@ -13,6 +13,7 @@ type AppConfig struct {
 	DbURL        string `mapstructure:"DB_URL"`
 	DbDriver     string `mapstructure:"DB_DRIVER"`
 	ServeAddress string `mapstructure:"SERVE_ADDRESS"`
+	ServePort    string `mapstructure:"SERVE_PORT"`
 }
 
 func LoadAppConfig(path string) (AppConfig, error) {
