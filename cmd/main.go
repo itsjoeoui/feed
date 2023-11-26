@@ -2,12 +2,18 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"feed/config"
+	r "feed/internal/database/repository"
+	handler "feed/internal/delivery/http"
+	u "feed/internal/domain/usecase"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	_ "github.com/lib/pq"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -23,6 +29,12 @@ func main() {
 		// https://github.com/rs/zerolog
 		log.Fatal().Err(err).Msg("unable to load configuration")
 	}
+
+	db, err := setupDB(config.DbDriver, config.DbURL)
+	if err != nil {
+		log.Fatal().Err(err).Msg("unable to connect to the database")
+	}
+	defer db.Close()
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	httplog.Configure(httplog.Options{
@@ -41,6 +53,10 @@ func main() {
 	router.Get("/", func(w http.ResponseWriter, _ *http.Request) {
 		w.Write([]byte("Hello, World!"))
 	})
+
+	tweetRepo := r.NewTweetRepository(db)
+	tweetUC := u.NewTweetUseCase(tweetRepo)
+	handler.NewTweetHandler(router, tweetUC)
 
 	server := newServer(config.ServeAddress+":"+config.ServePort, router)
 
@@ -78,4 +94,19 @@ func waitForShutdown(server *http.Server) {
 	if err := server.Shutdown(ctx); err != nil {
 		log.Fatal().Err(err).Msg("server shutdown failed")
 	}
+}
+
+// setupDB initiates the database connection
+func setupDB(driver, url string) (*sql.DB, error) {
+	db, err := sql.Open(driver, url)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := db.Ping(); err != nil {
+		db.Close()
+		return nil, err
+	}
+
+	return db, nil
 }

@@ -18,18 +18,36 @@ func NewTweetUseCase(repository r.TweetRepository) u.TweetUsecase {
 }
 
 // CreateTweet implements ports.TweetUsecase.
-func (s *tweetUseCase) CreateTweet(ctx context.Context, tweet *entity.Tweet) (int, error) {
-	panic("unimplemented")
+func (s *tweetUseCase) CreateTweet(ctx context.Context, t *entity.Tweet) (int, error) {
+	tweet, err := entity.NewTweet(t.Content, 69)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := s.tweetRepo.Create(ctx, tweet)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 // DeleteTweet implements ports.TweetUsecase.
 func (s *tweetUseCase) DeleteTweet(ctx context.Context, id int) error {
-	panic("unimplemented")
+	err := s.tweetRepo.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetTweet implements ports.TweetUsecase.
 func (s *tweetUseCase) GetTweet(ctx context.Context, id int) (*entity.Tweet, error) {
-	panic("unimplemented")
+	tweet, err := s.tweetRepo.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return tweet, nil
 }
 
 // ListTweets implements ports.TweetUsecase.
