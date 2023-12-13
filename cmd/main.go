@@ -4,15 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"feed/config"
+	"feed/internal/assets"
 	r "feed/internal/database/repository"
 	handler "feed/internal/delivery/http"
 	u "feed/internal/domain/usecase"
+	"feed/internal/templates/pages"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/a-h/templ"
 	_ "github.com/lib/pq"
 
 	"github.com/go-chi/chi/v5"
@@ -50,9 +53,9 @@ func main() {
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Recoverer)
 
-	router.Get("/", func(w http.ResponseWriter, _ *http.Request) {
-		w.Write([]byte("Hello, World!"))
-	})
+	router.Get("/", templ.Handler(pages.HomePage()).ServeHTTP)
+
+	assets.Mount(router)
 
 	tweetRepo := r.NewTweetRepository(db)
 	tweetUC := u.NewTweetUseCase(tweetRepo)
