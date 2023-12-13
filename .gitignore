@@ -1,3 +1,4 @@
 data/
 tmp/
 .env
+node_modules/
