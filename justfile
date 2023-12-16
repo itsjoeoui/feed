@@ -9,7 +9,7 @@ build:
   go build -o ./tmp/main ./cmd/main.go
 
 assets:
-  tailwindcss -i ./internal/assets/tailwind.css -o ./internal/assets/dist/styles.css
+  pnpm exec tailwindcss -i ./internal/assets/tailwind.css -o ./internal/assets/dist/styles.css
 
 migrateup:
   migrate -database ${DB_URL} -path internal/database/migrations up
