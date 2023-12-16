@@ -85,7 +85,7 @@ func (r *tweetRepository) Get(ctx context.Context, id int) (*entity.Tweet, error
 
 // List implements ports.TweetRepository.
 func (r *tweetRepository) List(ctx context.Context) ([]*entity.Tweet, error) {
-	stmt, err := r.db.PrepareContext(ctx, "SELECT * FROM tweets")
+	stmt, err := r.db.PrepareContext(ctx, "SELECT * FROM tweets ORDER BY created_at DESC")
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", ErrPrepareStatement, err)
 	}
