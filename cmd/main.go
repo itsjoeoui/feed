@@ -55,7 +55,7 @@ func main() {
 
 	tweetRepo := r.NewTweetRepository(db)
 	tweetUC := u.NewTweetUseCase(tweetRepo)
-	handler.NewTweetHandler(router, tweetUC)
+	// handler.NewTweetHandler(router, tweetUC)
 	handler.NewRootHandler(router, tweetUC)
 
 	server := newServer(config.ServeAddress+":"+config.ServePort, router)
