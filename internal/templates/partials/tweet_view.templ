@@ -1,0 +1,9 @@
+package partials
+
+import (
+	"feed/internal/domain/entity"
+)
+
+templ TweetView(tweet *entity.Tweet) {
+	<div>{ tweet.Content }</div>
+}
