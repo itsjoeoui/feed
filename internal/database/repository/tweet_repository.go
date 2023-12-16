@@ -84,8 +84,31 @@ func (r *tweetRepository) Get(ctx context.Context, id int) (*entity.Tweet, error
 }
 
 // List implements ports.TweetRepository.
-func (*tweetRepository) List(ctx context.Context) ([]*entity.Tweet, error) {
-	panic("unimplemented")
+func (r *tweetRepository) List(ctx context.Context) ([]*entity.Tweet, error) {
+	stmt, err := r.db.PrepareContext(ctx, "SELECT * FROM tweets")
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", ErrPrepareStatement, err)
+	}
+	defer stmt.Close()
+
+	ts := []*entity.Tweet{}
+
+	rows, err := stmt.QueryContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", ErrExecuteQuery, err)
+	}
+
+	for rows.Next() {
+		var t entity.Tweet
+		err = rows.Scan(&t.ID, &t.Content, &t.UserID, &t.CreatedAt)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", ErrScanData, err)
+		}
+
+		ts = append(ts, &t)
+	}
+
+	return ts, nil
 }
 
 // Search implements ports.TweetRepository.

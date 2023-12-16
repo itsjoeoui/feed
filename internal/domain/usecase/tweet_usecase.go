@@ -52,7 +52,11 @@ func (s *tweetUseCase) GetTweet(ctx context.Context, id int) (*entity.Tweet, err
 
 // ListTweets implements ports.TweetUsecase.
 func (s *tweetUseCase) ListTweets(ctx context.Context) ([]*entity.Tweet, error) {
-	panic("unimplemented")
+	tweets, err := s.tweetRepo.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return tweets, nil
 }
 
 // SearchTweets implements ports.TweetUsecase.

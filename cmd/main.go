@@ -7,16 +7,13 @@ import (
 	"feed/internal/assets"
 	r "feed/internal/database/repository"
 	handler "feed/internal/delivery/http"
-	"feed/internal/domain/entity"
 	u "feed/internal/domain/usecase"
-	"feed/internal/templates/pages"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/a-h/templ"
 	_ "github.com/lib/pq"
 
 	"github.com/go-chi/chi/v5"
@@ -54,19 +51,12 @@ func main() {
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Recoverer)
 
-	mockTweets := []*entity.Tweet{{
-		CreatedAt: time.Time{},
-		Content:   "Hello, World!",
-		UserID:    0,
-		ID:        0,
-	}}
-	router.Get("/", templ.Handler(pages.HomePage(mockTweets)).ServeHTTP)
-
 	assets.Mount(router)
 
 	tweetRepo := r.NewTweetRepository(db)
 	tweetUC := u.NewTweetUseCase(tweetRepo)
 	handler.NewTweetHandler(router, tweetUC)
+	handler.NewRootHandler(router, tweetUC)
 
 	server := newServer(config.ServeAddress+":"+config.ServePort, router)
 
