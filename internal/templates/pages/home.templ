@@ -1,9 +1,13 @@
 package pages
 
-import "feed/internal/templates/shared"
+import (
+	"feed/internal/domain/entity"
+	"feed/internal/templates/shared"
+	"feed/internal/templates/partials"
+)
 
-templ HomePage() {
+templ HomePage(tweets []*entity.Tweet) {
 	@shared.Page("Home") {
-		<div class="bg-blue-100">Hello World</div>
+		@partials.TweetsView(tweets)
 	}
 }

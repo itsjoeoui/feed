@@ -1,0 +1,13 @@
+package partials
+
+import (
+	"feed/internal/domain/entity"
+)
+
+templ TweetsView(tweets []*entity.Tweet) {
+	<div>
+		for _, tweet := range tweets {
+			@TweetView(tweet)
+		}
+	</div>
+}
