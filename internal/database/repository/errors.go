@@ -17,4 +17,5 @@ const (
 // Repository Errors
 var (
 	ErrTweetNotFound = errors.New("tweet not found")
+	ErrListTweets    = errors.New("failed to list tweets")
 )

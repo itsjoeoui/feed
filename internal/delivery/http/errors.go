@@ -9,6 +9,7 @@ const (
 	getTweet       = "failed to retrieve the tweet"
 	deleteTweet    = "failed to delete the tweet"
 	createTweet    = "failed to create the tweet"
+	listTweets     = "failed to list tweets"
 	tweetNotFound  = "the requested tweet was not found"
 	invalidTweetID = "invalid tweet ID provided, it should be a positive integer"
 )
