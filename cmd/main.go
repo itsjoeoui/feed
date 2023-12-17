@@ -24,7 +24,7 @@ import (
 )
 
 func main() {
-	config, err := config.LoadAppConfig(".")
+	config, err := config.LoadAppConfig()
 	if err != nil {
 		// We are using zerolog
 		// https://github.com/rs/zerolog
