@@ -15,6 +15,8 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -25,13 +27,22 @@ import (
 
 func main() {
 	config, err := config.LoadAppConfig()
+
+	googleOauthConfig := &oauth2.Config{
+		RedirectURL:  config.RedirectURL,
+		ClientID:     config.GoogleClientID,
+		ClientSecret: config.GoogleClientSecret,
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
+		Endpoint:     google.Endpoint,
+	}
+
 	if err != nil {
 		// We are using zerolog
 		// https://github.com/rs/zerolog
 		log.Fatal().Err(err).Msg("unable to load configuration")
 	}
 
-	db, err := setupDB(config.DbDriver, config.DbURL)
+	db, err := setupDB(config.DBDriver, config.DBURL)
 	if err != nil {
 		log.Fatal().Err(err).Msg("unable to connect to the database")
 	}
@@ -57,6 +68,8 @@ func main() {
 	tweetUC := u.NewTweetUseCase(tweetRepo)
 	// handler.NewTweetHandler(router, tweetUC)
 	handler.NewRootHandler(router, tweetUC)
+
+	handler.NewAuthHandler(router, googleOauthConfig)
 
 	server := newServer(config.ServeAddress+":"+config.ServePort, router)
 

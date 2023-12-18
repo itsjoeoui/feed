@@ -9,10 +9,13 @@ import (
 )
 
 type AppConfig struct {
-	DbURL        string `env:"DB_URL"`
-	DbDriver     string `env:"DB_DRIVER"`
-	ServeAddress string `env:"SERVE_ADDRESS"`
-	ServePort    string `env:"SERVE_PORT"`
+	DBURL              string `env:"DB_URL"`
+	DBDriver           string `env:"DB_DRIVER"`
+	ServeAddress       string `env:"SERVE_ADDRESS"`
+	ServePort          string `env:"SERVE_PORT"`
+	RedirectURL        string `env:"REDIRECT_URL"`
+	GoogleClientID     string `env:"GOOGLE_CLIENT_ID"`
+	GoogleClientSecret string `env:"GOOGLE_CLIENT_SECRET"`
 }
 
 func LoadAppConfig() (AppConfig, error) {
