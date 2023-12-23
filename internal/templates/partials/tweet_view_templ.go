@@ -27,7 +27,7 @@ func TweetView(tweet *entity.Tweet) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex gap-8 border border-slate-200 rounded-xl p-4 hover:bg-slate-50 transition duration-300 ease-in-out\"><div class=\"font-mono flex-shrink-0\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col md:flex-row gap-2 md:gap-8 border border-slate-200 rounded-xl p-4 hover:bg-slate-50 transition duration-300 ease-in-out\"><div class=\"font-mono flex-shrink-0\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
