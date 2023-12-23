@@ -17,9 +17,9 @@ templ Header() {
 			<a href="/about" class="" preload="mouseover">About</a>
 			<div class="grow"></div>
 			if getAuthenticatedUser(ctx) != "" {
-				<a href="/auth/google/logout">Logout</a>
+				<a href="/auth/google/logout" hx-disable>Logout</a>
 			} else {
-				<a href="/auth/google/login">Login</a>
+				<a href="/auth/google/login" hx-disable>Login</a>
 			}
 		</div>
 	</div>
