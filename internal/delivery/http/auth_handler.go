@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/jwtauth/v5"
 	"golang.org/x/oauth2"
 )
 
@@ -19,15 +20,35 @@ const oauthGoogleUrlAPI = "https://www.googleapis.com/oauth2/v2/userinfo?access_
 // TODO: waiting for the user to be authenticated
 type authHandler struct {
 	googleOauthConfig *oauth2.Config
+	tokenAuth         *jwtauth.JWTAuth
 }
 
-func NewAuthHandler(r *chi.Mux, googleOauthConfig *oauth2.Config) {
-	handler := &authHandler{googleOauthConfig: googleOauthConfig}
+func NewAuthHandler(r *chi.Mux, googleOauthConfig *oauth2.Config, tokenAuth *jwtauth.JWTAuth) {
+	handler := &authHandler{googleOauthConfig: googleOauthConfig, tokenAuth: tokenAuth}
 
 	r.Route("/auth", func(r chi.Router) {
 		r.Get("/google/login", handler.GoogleLogin)
+		r.Get("/google/logout", handler.GoogleLogout)
 		r.Get("/google/callback", handler.GoogleCallback)
 	})
+}
+
+func (h *authHandler) MakeToken(user string) string {
+	_, tokenString, _ := h.tokenAuth.Encode(map[string]interface{}{"user": user})
+	return tokenString
+}
+
+func (h *authHandler) GoogleLogout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now(),
+		Path:     "/",
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func (h *authHandler) GoogleLogin(w http.ResponseWriter, r *http.Request) {
@@ -52,12 +73,27 @@ func (h *authHandler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := h.getUserDataFromGoogle(r.FormValue("code"))
+	data, err := h.getUserDataFromGoogle(r.FormValue("code"))
 	if err != nil {
 		log.Println(err.Error())
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
+
+	log.Printf("UserInfo: %s\n", data)
+
+	// FIXME: Do not hardcode
+	token := h.MakeToken("itsjooeui")
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		Expires:  time.Now().Add(24 * time.Hour),
+		Path:     "/",
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
 
 	// GetOrCreate User in your db.
 	// Redirect or response with a token.
