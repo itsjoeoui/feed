@@ -1,0 +1,14 @@
+package pages
+
+import (
+	"feed/internal/templates/shared"
+	"feed/internal/templates/partials"
+)
+
+templ AboutPage() {
+	@shared.Page("Home") {
+		@partials.Header()
+		@partials.AboutView()
+		@partials.Footer()
+	}
+}

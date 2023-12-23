@@ -28,6 +28,7 @@ func NewRootHandler(r *chi.Mux, useCase uc.TweetUsecase, tokenAuth *jwtauth.JWTA
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(handler.authProvider)
 		r.Get("/", handler.ListTweets)
+		r.Get("/about", handler.AboutView)
 	})
 }
 
@@ -59,4 +60,8 @@ func (h *rootHandler) ListTweets(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templ.Handler(pages.HomePage(ts)).ServeHTTP(w, r)
+}
+
+func (h *rootHandler) AboutView(w http.ResponseWriter, r *http.Request) {
+	templ.Handler(pages.AboutPage()).ServeHTTP(w, r)
 }
