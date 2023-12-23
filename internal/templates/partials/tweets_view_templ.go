@@ -27,7 +27,7 @@ func TweetsView(tweets []*entity.Tweet) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container mx-auto px-4 flex flex-col gap-4\"><div class=\"py-2\"></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"container mx-auto px-4 flex flex-col gap-4 min-h-[calc(100vh-7rem)]\"><div class=\"py-2\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
