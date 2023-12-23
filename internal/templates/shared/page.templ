@@ -1,5 +1,10 @@
 package shared
 
+import (
+	"feed/internal/templates/partials"
+	"os"
+)
+
 templ Page(title string) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -11,6 +16,9 @@ templ Page(title string) {
 		</head>
 		<body class="">
 			{ children... }
+			if os.Getenv("FLY_APP_NAME") == "" {
+				@partials.TailwindIndicator()
+			}
 		</body>
 	</html>
 }
