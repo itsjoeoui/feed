@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/rs/zerolog/log"
 )
 
@@ -16,15 +17,20 @@ type tweetHandler struct {
 	TweetUsecase uc.TweetUsecase
 }
 
-func NewTweetHandler(r *chi.Mux, useCase uc.TweetUsecase) {
+func NewTweetHandler(r *chi.Mux, useCase uc.TweetUsecase, tokenAuth *jwtauth.JWTAuth) {
 	handler := &tweetHandler{
 		TweetUsecase: useCase,
 	}
 
-	r.Route("/v1/tweets", func(r chi.Router) {
-		r.Get("/{id}", handler.GetTweet)
-		r.Post("/", handler.CreateTweet)
-		r.Delete("/{id}", handler.DeleteTweet)
+	r.Group(func(r chi.Router) {
+		r.Use(jwtauth.Verifier(tokenAuth))
+		r.Use(jwtauth.Authenticator(tokenAuth))
+
+		r.Route("/v1/tweets", func(r chi.Router) {
+			r.Get("/{id}", handler.GetTweet)
+			r.Post("/", handler.CreateTweet)
+			r.Delete("/{id}", handler.DeleteTweet)
+		})
 	})
 }
 
