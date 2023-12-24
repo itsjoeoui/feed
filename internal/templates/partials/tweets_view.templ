@@ -11,6 +11,12 @@ templ TweetsView(tweets []*entity.Tweet) {
 		for _, tweet := range tweets {
 			@TweetView(tweet)
 		}
+		if tweets == nil || len(tweets) == 0 {
+			<div class="flex flex-col items-center justify-center">
+				<div class="text-2xl font-semibold">Joey hasn't posted anything yet.</div>
+				<div class="text-gray-500">Please check back later :)</div>
+			</div>
+		}
 		<div class="py-2"></div>
 	</div>
 }
