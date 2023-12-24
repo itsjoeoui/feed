@@ -15,7 +15,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// TODO: waiting for the user to be authenticated
 type authHandler struct {
 	googleOAuthConfig *oauth2.Config
 	tokenAuth         *jwtauth.JWTAuth
