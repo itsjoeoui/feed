@@ -3,6 +3,28 @@ package partials
 templ AboutView() {
 	<div class="container mx-auto px-4 flex flex-col gap-4 min-h-[calc(100vh-7rem)]">
 		<div class="py-2"></div>
-		<div>Welcome to my feed!</div>
+		<div>
+			Welcome to my feed! It is currently still under construction.
+			I will be using platform to share my findings and document my learning.
+		</div>
+		<div>
+			If you are wondering, this feed is built completly with Golang.
+			I am using <a href="https://github.com/go-chi/chi" target="_blank">chi</a> { `for` } routing,
+			and <a href="https://templ.guide/" target="_blank">templ</a> { `for` } HTML templating.
+			The styling is done with <a href="https://tailwindcss.com/" target="_blank">TailwindCSS</a>.
+		</div>
+		<div>
+			Everything is server-side rendered, and I use some <a href="https://htmx.org/" target="_blank">HTMX</a>
+			to help me with client side interations. I am also using the new 
+			<a href="https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API" target="_blank">View Transitions API</a>
+			to animate page transitions. (By the time of writing, this is only supported in Chromium based browsers).
+		</div>
+		<div>
+			The main takeaway from this project is that you do not need React/Next.js every time you want to build a website.
+			Go + templ + HTMX is another killer combo that people should consider. 
+		</div>
+		<div>
+			Happy coding!
+		</div>
 	</div>
 }
