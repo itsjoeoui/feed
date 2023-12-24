@@ -12,11 +12,6 @@ var Assets embed.FS
 
 func Mount(r chi.Router) {
 	r.Route("/dist", func(r chi.Router) {
-		r.Use(func(next http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				next.ServeHTTP(w, r)
-			})
-		})
 		r.Handle("/*", http.FileServer(http.FS(Assets)))
 	})
 }
