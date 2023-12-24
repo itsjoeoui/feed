@@ -5,12 +5,10 @@ import (
 	"os"
 
 	"github.com/caarlos0/env"
-	"github.com/go-chi/jwtauth/v5"
 	"github.com/joho/godotenv"
 )
 
 type AppConfig struct {
-	TokenAuth          *jwtauth.JWTAuth
 	DBURL              string `env:"DB_URL"`
 	DBDriver           string `env:"DB_DRIVER"`
 	ServeAddress       string `env:"SERVE_ADDRESS"`
@@ -35,8 +33,6 @@ func LoadAppConfig() (AppConfig, error) {
 	if err := env.Parse(&cfg); err != nil {
 		return AppConfig{}, fmt.Errorf("%+v", err)
 	}
-
-	cfg.TokenAuth = jwtauth.New("HS256", []byte(cfg.JWTSecret), nil)
 
 	return cfg, nil
 }

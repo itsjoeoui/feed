@@ -21,14 +21,24 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog"
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
 	config, err := config.LoadAppConfig()
+	if err != nil {
+		// We are using zerolog
+		// https://github.com/rs/zerolog
+		log.Fatal().Err(err).Msg("unable to load configuration")
+	}
 
-	googleOauthConfig := &oauth2.Config{
+	// Setup for JWT
+	tokenAuth := jwtauth.New("HS256", []byte(config.JWTSecret), nil)
+
+	// Setup Google OAuth
+	googleOAuthConfig := &oauth2.Config{
 		RedirectURL:  config.RedirectURL,
 		ClientID:     config.GoogleClientID,
 		ClientSecret: config.GoogleClientSecret,
@@ -36,43 +46,42 @@ func main() {
 		Endpoint:     google.Endpoint,
 	}
 
-	if err != nil {
-		// We are using zerolog
-		// https://github.com/rs/zerolog
-		log.Fatal().Err(err).Msg("unable to load configuration")
-	}
-
+	// Setup Postgres
 	db, err := setupDB(config.DBDriver, config.DBURL)
 	if err != nil {
 		log.Fatal().Err(err).Msg("unable to connect to the database")
 	}
 	defer db.Close()
 
+	// Configure out logger
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	httplog.Configure(httplog.Options{
 		Concise:         true,
 		TimeFieldFormat: time.DateTime,
 	})
 
+	// Setup the chi router
 	router := chi.NewRouter()
 
+	// Include middlewares that we want to enable for all routes.
 	router.Use(httplog.RequestLogger(log.Logger))
 	router.Use(middleware.Timeout(60 * time.Second))
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Recoverer)
 
+	// Mount everything in ./internal/assets/dist
+	// This includes the static CSS file for example.
 	assets.Mount(router)
 
 	tweetRepo := r.NewTweetRepository(db)
 	tweetUC := u.NewTweetUseCase(tweetRepo)
 
-	handler.NewTweetHandler(router, tweetUC, config.TokenAuth)
+	handler.NewTweetHandler(router, tweetUC, tokenAuth)
+	handler.NewRootHandler(router, tweetUC, tokenAuth)
+	handler.NewAuthHandler(router, googleOAuthConfig, tokenAuth)
 
-	handler.NewRootHandler(router, tweetUC, config.TokenAuth)
-
-	handler.NewAuthHandler(router, googleOauthConfig, config.TokenAuth)
-
+	// Start our server
 	server := newServer(config.ServeAddress+":"+config.ServePort, router)
 
 	go func() {

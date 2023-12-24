@@ -15,16 +15,14 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const oauthGoogleUrlAPI = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
-
 // TODO: waiting for the user to be authenticated
 type authHandler struct {
-	googleOauthConfig *oauth2.Config
+	googleOAuthConfig *oauth2.Config
 	tokenAuth         *jwtauth.JWTAuth
 }
 
-func NewAuthHandler(r *chi.Mux, googleOauthConfig *oauth2.Config, tokenAuth *jwtauth.JWTAuth) {
-	handler := &authHandler{googleOauthConfig: googleOauthConfig, tokenAuth: tokenAuth}
+func NewAuthHandler(r *chi.Mux, googleOAuthConfig *oauth2.Config, tokenAuth *jwtauth.JWTAuth) {
+	handler := &authHandler{googleOAuthConfig: googleOAuthConfig, tokenAuth: tokenAuth}
 
 	r.Route("/auth", func(r chi.Router) {
 		r.Get("/google/login", handler.GoogleLogin)
@@ -53,13 +51,13 @@ func (h *authHandler) GoogleLogout(w http.ResponseWriter, r *http.Request) {
 
 func (h *authHandler) GoogleLogin(w http.ResponseWriter, r *http.Request) {
 	// Create oauthState cookie
-	oauthState := h.generateStateOauthCookie(w)
+	oauthState := h.generateStateOAuthCookie(w)
 
 	/*
 		AuthCodeURL receive state that is a token to protect the user from CSRF attacks. You must always provide a non-empty string and
 		validate that it matches the the state query parameter on your redirect callback.
 	*/
-	u := h.googleOauthConfig.AuthCodeURL(oauthState)
+	u := h.googleOAuthConfig.AuthCodeURL(oauthState)
 	http.Redirect(w, r, u, http.StatusTemporaryRedirect)
 }
 
@@ -101,7 +99,7 @@ func (h *authHandler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-func (h *authHandler) generateStateOauthCookie(w http.ResponseWriter) string {
+func (h *authHandler) generateStateOAuthCookie(w http.ResponseWriter) string {
 	expiration := time.Now().Add(365 * 24 * time.Hour)
 
 	b := make([]byte, 16)
@@ -116,11 +114,11 @@ func (h *authHandler) generateStateOauthCookie(w http.ResponseWriter) string {
 func (h *authHandler) getUserDataFromGoogle(code string) ([]byte, error) {
 	// Use code to get token and get user info from Google.
 
-	token, err := h.googleOauthConfig.Exchange(context.Background(), code)
+	token, err := h.googleOAuthConfig.Exchange(context.Background(), code)
 	if err != nil {
 		return nil, fmt.Errorf("code exchange wrong: %s", err.Error())
 	}
-	response, err := http.Get(oauthGoogleUrlAPI + token.AccessToken)
+	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed getting user info: %s", err.Error())
 	}
