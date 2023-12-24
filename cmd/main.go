@@ -21,18 +21,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog"
-	"github.com/go-chi/jwtauth/v5"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
-
-var tokenAuth *jwtauth.JWTAuth
-
-const Secret = "<jwt-secret>" // Replace <jwt-secret> with your secret key that is private to you.
-
-func init() {
-	tokenAuth = jwtauth.New("HS256", []byte(Secret), nil)
-}
 
 func main() {
 	config, err := config.LoadAppConfig()
@@ -76,11 +67,11 @@ func main() {
 	tweetRepo := r.NewTweetRepository(db)
 	tweetUC := u.NewTweetUseCase(tweetRepo)
 
-	handler.NewTweetHandler(router, tweetUC, tokenAuth)
+	handler.NewTweetHandler(router, tweetUC, config.TokenAuth)
 
-	handler.NewRootHandler(router, tweetUC, tokenAuth)
+	handler.NewRootHandler(router, tweetUC, config.TokenAuth)
 
-	handler.NewAuthHandler(router, googleOauthConfig, tokenAuth)
+	handler.NewAuthHandler(router, googleOauthConfig, config.TokenAuth)
 
 	server := newServer(config.ServeAddress+":"+config.ServePort, router)
 

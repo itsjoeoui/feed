@@ -5,10 +5,12 @@ import (
 	"os"
 
 	"github.com/caarlos0/env"
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/joho/godotenv"
 )
 
 type AppConfig struct {
+	TokenAuth          *jwtauth.JWTAuth
 	DBURL              string `env:"DB_URL"`
 	DBDriver           string `env:"DB_DRIVER"`
 	ServeAddress       string `env:"SERVE_ADDRESS"`
@@ -16,6 +18,7 @@ type AppConfig struct {
 	RedirectURL        string `env:"REDIRECT_URL"`
 	GoogleClientID     string `env:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret string `env:"GOOGLE_CLIENT_SECRET"`
+	JWTSecret          string `env:"JWT_SECRET"`
 }
 
 func LoadAppConfig() (AppConfig, error) {
@@ -32,6 +35,8 @@ func LoadAppConfig() (AppConfig, error) {
 	if err := env.Parse(&cfg); err != nil {
 		return AppConfig{}, fmt.Errorf("%+v", err)
 	}
+
+	cfg.TokenAuth = jwtauth.New("HS256", []byte(cfg.JWTSecret), nil)
 
 	return cfg, nil
 }
