@@ -77,7 +77,7 @@ func main() {
 	tweetRepo := r.NewTweetRepository(db)
 	tweetUC := u.NewTweetUseCase(tweetRepo)
 
-	handler.NewTweetHandler(router, tweetUC, tokenAuth)
+	// handler.NewTweetHandler(router, tweetUC, tokenAuth)
 	handler.NewRootHandler(router, tweetUC, tokenAuth)
 	handler.NewAuthHandler(router, googleOAuthConfig, tokenAuth)
 
